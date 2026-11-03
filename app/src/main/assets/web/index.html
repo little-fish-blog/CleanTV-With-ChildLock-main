@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CleanTV 电视遥控与管理后台</title>
+<style>
+  :root {
+    --bg: #121418; --card: #1c222e; --text: #ffffff; --sub: #9ca3af;
+    --tint: #0a84ff; --green: #34c759; --danger: #ff453a; --border: rgba(255,255,255,0.12);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
+    padding: 16px 16px 80px; max-width: 640px; margin: 0 auto;
+  }
+  header { padding: 16px 0 20px; text-align: center; border-bottom: 1px solid var(--border); }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  header p { margin: 0; color: var(--sub); font-size: 14px; }
+  .section-title { font-size: 17px; font-weight: 600; margin: 24px 0 12px; display: flex; align-items: center; justify-content: space-between; }
+  .card {
+    background: var(--card); border-radius: 16px; padding: 16px; border: 1px solid var(--border);
+    margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .input-group { display: flex; gap: 8px; margin-top: 10px; }
+  input[type="text"], textarea {
+    flex: 1; background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; color: #fff; font-size: 16px; outline: none; width: 100%;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--tint); background: rgba(255,255,255,0.12); }
+  button {
+    background: var(--tint); color: #fff; border: none; border-radius: 10px; padding: 12px 18px;
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  button:active { opacity: 0.8; transform: scale(0.98); }
+  button.green { background: var(--green); }
+  button.danger { background: var(--danger); }
+  button.gray { background: rgba(255,255,255,0.15); }
+  .quick-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .quick-keys button { padding: 14px 8px; font-size: 15px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); }
+  .quick-keys button:active { background: rgba(255,255,255,0.2); }
+  .app-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; }
+  .app-item {
+    display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+    background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .app-name { font-size: 15px; font-weight: 500; }
+  .app-actions { display: flex; gap: 6px; }
+  .app-actions button { padding: 6px 12px; font-size: 13px; }
+  .rule-item {
+    padding: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05);
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);
+  }
+  .rule-title { font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
+  .rule-sub { font-size: 13px; color: var(--sub); margin-top: 4px; }
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CleanTV 电视助手</h1>
+  <p id="deviceInfo">乐视超级电视 X65 · 局域网已连接</p>
+</header>
+
+<!-- 1. 儿童模式多规则管控卡片 -->
+<div class="section-title">
+  <span>👶 儿童模式防沉迷管控</span>
+  <span id="childStatusBadge" style="font-size:13px; padding:2px 8px; border-radius:6px; background:#34c759;">已开启</span>
+</div>
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div>
+      <div style="font-weight:600;" id="tvCurrentMode">当前模式：大人模式</div>
+      <div style="font-size:13px; color:var(--sub); margin-top:4px;" id="tvTodayTime">今日儿童累计：0 分钟</div>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <button class="gray" style="padding:6px 12px; font-size:13px;" onclick="toggleChildLock()">启/停总开关</button>
+      <button class="green" style="padding:6px 12px; font-size:13px;" onclick="switchMode()">切换模式</button>
+    </div>
+  </div>
+
+  <div id="cooldownBanner" style="display:none; padding:10px; background:rgba(255,69,58,0.15); border:1px solid #ff453a; border-radius:8px; margin-bottom:12px; font-size:13px;">
+    <span>⚠️ 正在休息冷却中，剩余：</span><b id="cooldownTime" style="color:#ff453a;">00:00</b>
+    <button class="danger" style="padding:4px 8px; font-size:12px; float:right;" onclick="resetCooldown()">解除休息</button>
+  </div>
+
+  <div style="font-size:14px; font-weight:600; margin-bottom:8px;">生效时段规则：</div>
+  <div id="rulesList">
+    <div style="color:var(--sub); font-size:13px;">正在加载时段规则...</div>
+  </div>
+</div>
+
+<!-- 2. 手机电脑远程输入文字到电视 -->
+<div class="section-title">⌨️ 手机/电脑文字输入投送到电视</div>
+<div class="card">
+  <div style="font-size:13px; color:var(--sub); margin-bottom:8px;">
+    电视出现搜索框、密码框时，在手机/电脑上打字，直接一键打入电视：
+  </div>
+  <textarea id="inputText" rows="2" placeholder="在此输入文字、网址、Wi-Fi密码、影视搜索词..."></textarea>
+  <div class="input-group">
+    <button class="green" style="flex:1;" onclick="sendInputText()">🚀 立即输入到电视</button>
+    <button class="gray" onclick="sendInputText('clear')">清空</button>
+  </div>
+</div>
+
+<!-- 3. 遥控按键辅助 -->
+<div class="section-title">🎮 虚拟方向导航</div>
+<div class="card">
+  <div class="quick-keys" style="grid-template-columns: repeat(3, 1fr); max-width: 280px; margin: 0 auto;">
+    <div></div>
+    <button onclick="sendKey(19)">▲ 上</button>
+    <div></div>
+    <button onclick="sendKey(21)">◀ 左</button>
+    <button class="green" onclick="sendKey(23)">OK 确定</button>
+    <button onclick="sendKey(22)">右 ▶</button>
+    <button onclick="sendKey(4)">↩ 返回</button>
+    <button onclick="sendKey(20)">▼ 下</button>
+    <button class="tint" onclick="sendKey(3)">⌂ 桌面</button>
+  </div>
+</div>
+
+<!-- 4. 桌面单排应用列表 -->
+<div class="section-title">
+  <span>📱 已安装应用</span>
+  <button class="gray" style="padding:4px 10px; font-size:12px;" onclick="loadState()">刷新</button>
+</div>
+<div class="card">
+  <div class="app-list" id="appList">
+    <div style="text-align:center; padding:20px; color:var(--sub);">正在加载应用列表...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const base = location.pathname.replace(/\/?$/, '/');
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+async function api(path, data) {
+  const res = await fetch(base + path, {
+    method: data ? 'POST' : 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    body: data ? JSON.stringify(data) : undefined
+  });
+  return res.json();
+}
+
+async function sendInputText(action) {
+  const textEl = document.getElementById('inputText');
+  if (action === 'clear') {
+    textEl.value = '';
+    return;
+  }
+  const text = textEl.value.trim();
+  if (!text) {
+    toast('请输入要发送到电视的内容');
+    return;
+  }
+  try {
+    const res = await api('api/action', { action: 'input_text', text: text });
+    if (res.success) {
+      toast('✓ 已成功输入到电视！');
+    } else {
+      toast('输入失败');
+    }
+  } catch (e) {
+    toast('网络连接失败');
+  }
+}
+
+async function sendKey(code) {
+  try {
+    await api('api/action', { action: 'send_key', keyCode: code });
+    toast('按键已发送');
+  } catch (e) {
+    toast('按键发送失败');
+  }
+}
+
+async function loadState() {
+  try {
+    const state = await api('api/state');
+    if (state.model) {
+      document.getElementById('deviceInfo').textContent = `${state.model} · Android ${state.androidVersion}`;
+    }
+
+    // 儿童锁渲染
+    if (state.childLock) {
+      const cl = state.childLock;
+      const badge = document.getElementById('childStatusBadge');
+      badge.textContent = cl.enabled ? '已开启' : '已停用';
+      badge.style.background = cl.enabled ? '#34c759' : '#888';
+
+      document.getElementById('tvCurrentMode').textContent = '当前模式：' +
+          (cl.mode === 'ADULT' ? '👨‍👩‍👧 大人模式（无限制）' : (cl.mode === 'CHILD' ? '👶 儿童模式（限时管控中）' : '未选择'));
+      document.getElementById('tvTodayTime').textContent = `今日儿童累计观看：${cl.todayWatchedMinutes} 分钟`;
+
+      const cdBanner = document.getElementById('cooldownBanner');
+      if (cl.isCooldown && cl.cooldownRemainSeconds > 0) {
+        cdBanner.style.display = 'block';
+        const m = Math.floor(cl.cooldownRemainSeconds / 60);
+        const s = cl.cooldownRemainSeconds % 60;
+        document.getElementById('cooldownTime').textContent = `${m}分${s}秒`;
+      } else {
+        cdBanner.style.display = 'none';
+      }
+
+      // 规则列表
+      const rContainer = document.getElementById('rulesList');
+      rContainer.innerHTML = '';
+      if (cl.rules && cl.rules.length) {
+        cl.rules.forEach(r => {
+          const rEl = document.createElement('div');
+          rEl.className = 'rule-item';
+          const formatTime = (h, m) => `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}`;
+          rEl.innerHTML = `
+            <div class="rule-title">
+              <span>${r.name}</span>
+              <span style="color:${r.enabled ? '#34c759':'#888'}">${r.enabled ? '生效中':'已停用'}</span>
+            </div>
+            <div class="rule-sub">
+              管控时段：${formatTime(r.startHour, r.startMinute)} - ${formatTime(r.endHour, r.endMinute)} |
+              单次 ${r.singleLimitMinutes} 分钟 | 冷却 ${r.cooldownMinutes} 分钟 | 日上限 ${r.dailyLimitMinutes} 分钟
+            </div>
+          `;
+          rContainer.appendChild(rEl);
+        });
+      } else {
+        rContainer.innerHTML = '<div style="color:var(--sub); font-size:13px;">暂无时段规则</div>';
+      }
+    }
+
+    // 应用列表
+    const container = document.getElementById('appList');
+    container.innerHTML = '';
+    if (!state.apps || !state.apps.length) {
+      container.innerHTML = '<div style="text-align:center; padding:20px;">未找到已安装应用</div>';
+      return;
+    }
+    state.apps.forEach(app => {
+      const item = document.createElement('div');
+      item.className = 'app-item';
+      item.innerHTML = `
+        <span class="app-name">${app.label}</span>
+        <div class="app-actions">
+          <button class="gray" onclick="launchApp('${app.packageName}')">启动</button>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  } catch (e) {
+    toast('获取状态失败');
+  }
+}
+
+async function toggleChildLock() {
+  try {
+    await api('api/action', { action: 'childlock_toggle' });
+    toast('儿童锁状态已更新');
+    loadState();
+  } catch (e) {
+    toast('操作失败');
+  }
+}
+
+async function switchMode() {
+  try {
+    const cur = document.getElementById('tvCurrentMode').textContent;
+    const target = cur.includes('大人') ? 'CHILD' : 'ADULT';
+    await api('api/action', { action: 'childlock_switch_mode', mode: target });
+    toast('已切换为：' + (target === 'ADULT' ? '大人模式' : '儿童模式'));
+    loadState();
+  } catch (e) {
+    toast('切换失败');
+  }
+}
+
+async function resetCooldown() {
+  try {
+    await api('api/action', { action: 'childlock_reset_cooldown' });
+    toast('已解除冷却休息限制');
+    loadState();
+  } catch (e) {
+    toast('解除失败');
+  }
+}
+
+async function launchApp(pkg) {
+  try {
+    await api('api/action', { action: 'launch_app', packageName: pkg });
+    toast('正在电视上打开应用');
+  } catch (e) {
+    toast('打开应用失败');
+  }
+}
+
+loadState();
+</script>
+</body>
+</html>

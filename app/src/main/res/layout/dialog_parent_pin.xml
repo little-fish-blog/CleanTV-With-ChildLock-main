@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="440dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_menu_bubble"
+    android:padding="28dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/tv_pin_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔒 请输入家长密码"
+        android:textColor="#FFFFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_pin_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="默认密码为 1234"
+        android:textColor="#B0C4DE"
+        android:textSize="14sp" />
+
+    <!-- 4 个密码点状态指示 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <View
+            android:id="@+id/pin_dot_1"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/status_dot" />
+
+        <View
+            android:id="@+id/pin_dot_2"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/status_dot" />
+
+        <View
+            android:id="@+id/pin_dot_3"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/status_dot" />
+
+        <View
+            android:id="@+id/pin_dot_4"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="6dp"
+            android:background="@drawable/status_dot" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_pin_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="密码错误，请重新输入"
+        android:textColor="#FFFF453A"
+        android:textSize="13sp"
+        android:visibility="invisible" />
+
+    <!-- 电视大屏专属：自动呈现的 3x4 遥控器虚拟数字键盘 -->
+    <GridLayout
+        android:id="@+id/grid_pin_keyboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:columnCount="3"
+        android:rowCount="4"
+        android:gravity="center">
+
+        <!-- 第 1 排：1, 2, 3 -->
+        <Button android:id="@+id/btn_num_1" style="@style/PinKeyBtn" android:text="1" />
+        <Button android:id="@+id/btn_num_2" style="@style/PinKeyBtn" android:text="2" />
+        <Button android:id="@+id/btn_num_3" style="@style/PinKeyBtn" android:text="3" />
+
+        <!-- 第 2 排：4, 5, 6 -->
+        <Button android:id="@+id/btn_num_4" style="@style/PinKeyBtn" android:text="4" />
+        <Button android:id="@+id/btn_num_5" style="@style/PinKeyBtn" android:text="5" />
+        <Button android:id="@+id/btn_num_6" style="@style/PinKeyBtn" android:text="6" />
+
+        <!-- 第 3 排：7, 8, 9 -->
+        <Button android:id="@+id/btn_num_7" style="@style/PinKeyBtn" android:text="7" />
+        <Button android:id="@+id/btn_num_8" style="@style/PinKeyBtn" android:text="8" />
+        <Button android:id="@+id/btn_num_9" style="@style/PinKeyBtn" android:text="9" />
+
+        <!-- 第 4 排：清空, 0, 取消 -->
+        <Button android:id="@+id/btn_pin_clear" style="@style/PinKeyBtn" android:text="清除" android:textSize="15sp" android:textColor="@color/menu_warning_text_color" />
+        <Button android:id="@+id/btn_num_0" style="@style/PinKeyBtn" android:text="0" />
+        <Button android:id="@+id/btn_pin_cancel" style="@style/PinKeyBtn" android:text="取消" android:textSize="15sp" android:textColor="@color/menu_item_text_color" />
+    </GridLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="💡 遥控器方向键移动焦点按OK键输入，也可直接按数字键"
+        android:textColor="#78909C"
+        android:textSize="12sp" />
+
+</LinearLayout>

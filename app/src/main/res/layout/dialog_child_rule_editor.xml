@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="520dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_menu_bubble"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tv_dialog_rule_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="⏰ 配置管控时段规则"
+        android:textColor="#FFFFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- 规则名称 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="规则名称："
+        android:textColor="#B0BEC5"
+        android:textSize="13sp" />
+
+    <EditText
+        android:id="@+id/et_edit_rule_name"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/settings_row_bg"
+        android:hint="如：上学日晚间、周末上午"
+        android:textColorHint="#607D8B"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14sp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true" />
+
+    <!-- 生效星期多选 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="生效星期（点击切换勾选）："
+        android:textColor="#B0BEC5"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <Button android:id="@+id/btn_day_1" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="一" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_2" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="二" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_3" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="三" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_4" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="四" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_5" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="五" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_6" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="六" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+        <Button android:id="@+id/btn_day_7" android:layout_width="0dp" android:layout_height="36dp" android:layout_weight="1" android:text="日" android:layout_margin="2dp" android:background="@drawable/btn_menu_item" android:textColor="@color/menu_item_text_color" android:textStyle="bold" android:textSize="13sp" android:focusable="true"/>
+    </LinearLayout>
+
+    <!-- 管控时间窗 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="管控时间窗（点击加1小时）："
+        android:textColor="#B0BEC5"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/btn_edit_start_time"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_menu_item"
+            android:text="开始: 16:00"
+            android:textColor="@color/menu_item_text_color"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:focusable="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="至"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_edit_end_time"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_menu_item"
+            android:text="结束: 22:00"
+            android:textColor="@color/menu_item_text_color"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- 限额参数 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="时长控制（分钟，可直接输入）："
+        android:textColor="#B0BEC5"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_edit_single_limit"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/settings_row_bg"
+            android:hint="单次上限"
+            android:textColorHint="#607D8B"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp"
+            android:inputType="number"
+            android:maxLength="3"
+            android:gravity="center"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/et_edit_cooldown"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/settings_row_bg"
+            android:hint="冷却间隔"
+            android:textColorHint="#607D8B"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp"
+            android:inputType="number"
+            android:maxLength="3"
+            android:gravity="center"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/et_edit_daily_limit"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/settings_row_bg"
+            android:hint="每日上限"
+            android:textColorHint="#607D8B"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp"
+            android:inputType="number"
+            android:maxLength="3"
+            android:gravity="center"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <!-- 底部操作按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_save_edit_rule"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/emotn_card_bg"
+            android:text="💾 保存规则"
+            android:textColor="@color/menu_item_text_color"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/btn_cancel_edit_rule"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_menu_item"
+            android:text="取消"
+            android:textColor="@color/menu_item_text_color"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:focusable="true" />
+    </LinearLayout>
+
+</LinearLayout>

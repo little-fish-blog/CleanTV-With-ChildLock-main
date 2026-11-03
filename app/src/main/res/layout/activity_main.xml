@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <!-- Emotn UI default / custom wallpaper behind everything -->
+    <ImageView
+        android:id="@+id/mainWallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/wallpaper_emotn_default" />
+
+    <!-- Ambient glow in the colour of the focused dock app. -->
+    <View
+        android:id="@+id/ambient"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top Area: Emotn UI style Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:paddingTop="36dp">
+
+            <!-- Left: Semi-transparent Frosted Weather Card -->
+            <FrameLayout
+                android:id="@+id/emotnWeatherCard"
+                android:layout_width="260dp"
+                android:layout_height="130dp"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/emotn_weather_card_bg"
+                android:paddingStart="22dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvWeatherTemp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="18°C"
+                            android:textColor="#FFFFFFFF"
+                            android:textSize="40sp"
+                            android:fontVariationSettings="'wght' 600"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvWeatherDesc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="晴"
+                            android:textColor="#E6FFFFFF"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvWeatherCity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="📍 Beijing, CN"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Hidden placeholders for backwards-compatibility with MainActivity fields -->
+                <TextView
+                    android:id="@+id/lunar"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+                <View
+                    android:id="@+id/clockRow"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+                <View
+                    android:id="@+id/weatherLine"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/weatherIcon"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/weatherText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- Right: Settings & Wi-Fi & Clock -->
+            <LinearLayout
+                android:id="@+id/topButtons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:orientation="vertical"
+                android:gravity="end">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/btnWallpaper"
+                        style="@style/TopButton"
+                        android:text="@string/desktop"
+                        android:drawableStart="@drawable/ic_wallpaper" />
+
+                    <TextView
+                        android:id="@+id/btnChildLock"
+                        style="@style/TopButton"
+                        android:text="儿童锁"
+                        android:drawableStart="@drawable/ic_settings" />
+
+                    <TextView
+                        android:id="@+id/btnDock"
+                        style="@style/TopButton"
+                        android:text="@string/favourites"
+                        android:drawableStart="@drawable/ic_dock" />
+
+                    <TextView
+                        android:id="@+id/btnInputs"
+                        style="@style/TopButton"
+                        android:text="@string/inputs"
+                        android:drawableStart="@drawable/ic_input" />
+
+                    <TextView
+                        android:id="@+id/btnWifi"
+                        style="@style/TopButton"
+                        android:text="@string/wifi"
+                        android:drawableStart="@drawable/ic_wifi" />
+
+                    <TextView
+                        android:id="@+id/btnSettings"
+                        style="@style/TopButton"
+                        android:text="@string/settings"
+                        android:drawableStart="@drawable/ic_settings" />
+
+                    <ImageView
+                        android:id="@+id/btnLibrary"
+                        style="@style/TopButtonIcon"
+                        android:contentDescription="@string/app_library"
+                        android:src="@drawable/ic_apps"
+                        android:tint="@drawable/pill_text" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:gravity="end">
+
+                    <TextClock
+                        android:id="@+id/clock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:format12Hour="HH:mm"
+                        android:format24Hour="HH:mm"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="36sp"
+                        android:fontVariationSettings="'wght' 300" />
+
+                    <!-- 儿童/大人模式状态胶囊提示 -->
+                    <TextView
+                        android:id="@+id/tvModeBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:background="@drawable/emotn_card_bg"
+                        android:textColor="#81D4FA"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Middle: Top shelf focused app title & status, centered directly above the first app tile -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="280dp">
+
+            <!-- "常用应用" label removed per user requirement -->
+            <View
+                android:id="@+id/tvSectionLabel"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <!-- First tile: grid paddingStart 40dp + item paddingStart 10dp = 50dp. Width = 216dp.
+                 Left = 50dp, Width = 216dp, center aligns with first tile center -->
+            <TextView
+                android:id="@+id/heroName"
+                android:layout_width="216dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:gravity="center"
+                android:alpha="0"
+                android:textColor="#FFFFFFFF"
+                android:textSize="32sp"
+                android:fontVariationSettings="'wght' 400"
+                android:singleLine="true" />
+        </FrameLayout>
+
+        <!-- Bottom: Single Horizontal Row with 5 items on screen -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!-- The single floating glass highlight that springs between tiles, placed inside the FrameLayout with tiles -->
+            <com.cleantv.launcher.GlassView
+                android:id="@+id/glass"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:alpha="0"
+                android:importantForAccessibility="no" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:descendantFocusability="afterDescendants" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

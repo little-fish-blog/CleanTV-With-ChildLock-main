@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rest_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0D131D"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="40dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="👀"
+            android:textSize="64sp" />
+
+        <TextView
+            android:id="@+id/tv_rest_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="护眼休息时间到了"
+            android:textColor="#FFFFFFFF"
+            android:textSize="38sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_rest_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="单次观看时长已满，请远离屏幕，让眼睛休息一下哦！"
+            android:textColor="#B0C4DE"
+            android:textSize="20sp" />
+
+        <!-- 休息倒计时 -->
+        <TextView
+            android:id="@+id/tv_rest_countdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="59:59"
+            android:textColor="#34C759"
+            android:textSize="68sp"
+            android:fontFamily="sans-serif-thin"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_rest_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="休息倒计时结束后，才可再次开启儿童模式"
+            android:textColor="#78909C"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btn_parent_unlock"
+            android:layout_width="220dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/emotn_card_bg"
+            android:text="🔑 家长解锁"
+            android:textColor="@color/menu_item_text_color"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</FrameLayout>
