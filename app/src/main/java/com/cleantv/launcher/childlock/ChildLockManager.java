@@ -41,6 +41,7 @@ public class ChildLockManager {
     private long childSessionStartTimeMs = 0L;
     private int currentSessionWatchedSeconds = 0;
     private String lastLaunchedPackage = null;
+    private String cachedForegroundPackage = null;
     private boolean isTickRunning = false;
 
     public static ChildLockManager getInstance(Context context) {
@@ -347,7 +348,54 @@ public class ChildLockManager {
      */
     public void onAppLaunched(String packageName) {
         this.lastLaunchedPackage = packageName;
+        this.cachedForegroundPackage = packageName;
         Log.i(TAG, "App launched from desk: " + packageName);
+    }
+
+    public boolean hasUsageStatsAccess() {
+        try {
+            android.app.AppOpsManager appOps =
+                    (android.app.AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            return appOps != null && appOps.checkOpNoThrow(
+                    android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), context.getPackageName())
+                    == android.app.AppOpsManager.MODE_ALLOWED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String getForegroundPackage() {
+        try {
+            android.app.usage.UsageStatsManager usageStatsManager =
+                    (android.app.usage.UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+            if (usageStatsManager == null) return cachedForegroundPackage;
+
+            long now = System.currentTimeMillis();
+            List<android.app.usage.UsageStats> stats = usageStatsManager.queryUsageStats(
+                    android.app.usage.UsageStatsManager.INTERVAL_DAILY,
+                    now - 24 * 3600_000L, now);
+            if (stats == null || stats.isEmpty()) return cachedForegroundPackage;
+
+            android.app.usage.UsageStats mostRecent = null;
+            for (android.app.usage.UsageStats stat : stats) {
+                if (stat.getLastTimeUsed() == 0) continue;
+                if (mostRecent == null || stat.getLastTimeUsed() > mostRecent.getLastTimeUsed()) {
+                    mostRecent = stat;
+                }
+            }
+            if (mostRecent != null) {
+                cachedForegroundPackage = mostRecent.getPackageName();
+            }
+            return cachedForegroundPackage;
+        } catch (Exception e) {
+            return cachedForegroundPackage;
+        }
+    }
+
+    private boolean isExemptForeground(String packageName) {
+        if (packageName == null) return false;
+        return packageName.equals(context.getPackageName()) || store.isWhitelisted(packageName);
     }
 
     /**
@@ -497,7 +545,11 @@ public class ChildLockManager {
 
         // 如果在儿童模式会话中
         if (ChildLockStore.MODE_CHILD.equals(store.getCurrentSessionMode()) && isChildSessionActive) {
-            // 累计观看秒数
+            String foregroundPackage = hasUsageStatsAccess()
+                    ? getForegroundPackage() : lastLaunchedPackage;
+            // 桌面与白名单应用不计入观看时长；无法识别前台时保持限制，避免漏计。
+            if (isExemptForeground(foregroundPackage)) return;
+
             currentSessionWatchedSeconds += 2;
             store.addWatchedSeconds(2);
 

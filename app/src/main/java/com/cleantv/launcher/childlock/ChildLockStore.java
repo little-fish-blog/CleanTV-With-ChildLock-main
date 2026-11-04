@@ -19,6 +19,7 @@ public class ChildLockStore {
     private static final String KEY_ENABLED = "child_lock_enabled";
     private static final String KEY_PASSWORD = "master_password";
     private static final String KEY_RULES_JSON = "rules_json";
+    private static final String KEY_WHITELIST_JSON = "whitelist_packages_json";
     private static final String KEY_ANTI_TAMPER = "anti_tamper_enabled";
 
     // 运行状态数据
@@ -103,6 +104,32 @@ public class ChildLockStore {
     public void saveRules(List<ChildLockRule> rules) {
         String json = gson.toJson(rules);
         prefs.edit().putString(KEY_RULES_JSON, json).apply();
+    }
+
+    // --- 应用白名单 ---
+
+    public java.util.Set<String> getWhitelist() {
+        String json = prefs.getString(KEY_WHITELIST_JSON, null);
+        if (json == null || json.trim().isEmpty()) {
+            return new java.util.LinkedHashSet<>();
+        }
+        try {
+            Type type = new TypeToken<java.util.LinkedHashSet<String>>() {}.getType();
+            java.util.Set<String> packages = gson.fromJson(json, type);
+            return packages != null ? packages : new java.util.LinkedHashSet<>();
+        } catch (Exception e) {
+            return new java.util.LinkedHashSet<>();
+        }
+    }
+
+    public boolean isWhitelisted(String packageName) {
+        return packageName != null && getWhitelist().contains(packageName);
+    }
+
+    public void setWhitelist(java.util.Set<String> packages) {
+        java.util.Set<String> safePackages = packages != null
+                ? packages : new java.util.LinkedHashSet<>();
+        prefs.edit().putString(KEY_WHITELIST_JSON, gson.toJson(safePackages)).apply();
     }
 
     public void addOrUpdateRule(ChildLockRule rule) {

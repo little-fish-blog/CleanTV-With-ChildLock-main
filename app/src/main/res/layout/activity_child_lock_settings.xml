@@ -162,7 +162,37 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- 5. 清除冷却限制 -->
+                <!-- 5. 应用白名单 -->
+                <LinearLayout
+                    android:id="@+id/row_app_whitelist"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/settings_row_bg"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="应用白名单（不计观看时长）"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_app_whitelist_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="已选 0 个应用"
+                        android:textColor="#9E9E9E"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- 6. 清除冷却限制 -->
                 <LinearLayout
                     android:id="@+id/row_reset_cooldown"
                     android:layout_width="match_parent"

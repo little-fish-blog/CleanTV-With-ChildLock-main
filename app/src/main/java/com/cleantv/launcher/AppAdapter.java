@@ -556,7 +556,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
     private void launch(Entry e) {
         com.cleantv.launcher.childlock.ChildLockManager lockMgr =
                 com.cleantv.launcher.childlock.ChildLockManager.getInstance(ctx);
-        if (lockMgr.isCurrentlyInRestCooldown()) {
+        if (lockMgr.isCurrentlyInRestCooldown() && !lockMgr.getStore().isWhitelisted(e.pkg)) {
             Toast.makeText(ctx, "眼睛休息时间未结束，请继续休息！", Toast.LENGTH_SHORT).show();
             if (ctx instanceof android.app.Activity) {
                 lockMgr.checkOnDeskResume((android.app.Activity) ctx);

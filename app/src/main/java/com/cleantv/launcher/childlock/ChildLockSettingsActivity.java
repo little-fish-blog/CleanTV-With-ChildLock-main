@@ -2,7 +2,11 @@ package com.cleantv.launcher.childlock;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +19,11 @@ import android.widget.Toast;
 import com.cleantv.launcher.R;
 import com.cleantv.launcher.Typefaces;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 电视遥控器端：儿童模式与家长设置中心
@@ -26,6 +34,7 @@ public class ChildLockSettingsActivity extends Activity {
     private TextView tvMasterSwitchStatus;
     private TextView tvCurrentModeStatus;
     private TextView tvAntiTamperStatus;
+    private TextView tvAppWhitelistStatus;
     private TextView tvTodayWatched;
     private LinearLayout layoutRulesContainer;
 
@@ -41,10 +50,17 @@ public class ChildLockSettingsActivity extends Activity {
         refreshStatus();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (store != null) refreshStatus();
+    }
+
     private void initViews() {
         tvMasterSwitchStatus = findViewById(R.id.tv_master_switch_status);
         tvCurrentModeStatus = findViewById(R.id.tv_current_mode_status);
         tvAntiTamperStatus = findViewById(R.id.tv_anti_tamper_status);
+        tvAppWhitelistStatus = findViewById(R.id.tv_app_whitelist_status);
         tvTodayWatched = findViewById(R.id.tv_today_watched);
         layoutRulesContainer = findViewById(R.id.layout_rules_container);
 
@@ -80,7 +96,10 @@ public class ChildLockSettingsActivity extends Activity {
         // 4. 修改 4 位家长密码
         findViewById(R.id.row_change_password).setOnClickListener(v -> showChangePasswordDialog());
 
-        // 5. 重置今日已看时长与冷却
+        // 5. 应用白名单
+        findViewById(R.id.row_app_whitelist).setOnClickListener(v -> showWhitelistEntry());
+
+        // 6. 重置今日已看时长与冷却
         findViewById(R.id.row_reset_cooldown).setOnClickListener(v -> {
             store.clearCooldown();
             store.clearTempUnlock();
@@ -88,10 +107,10 @@ public class ChildLockSettingsActivity extends Activity {
             refreshStatus();
         });
 
-        // 6. 添加新规则
+        // 7. 添加新规则
         findViewById(R.id.btn_add_rule).setOnClickListener(v -> showRuleEditDialog(null));
 
-        // 7. 返回按钮
+        // 8. 返回按钮
         findViewById(R.id.btn_close_settings).setOnClickListener(v -> finish());
     }
 
@@ -120,7 +139,109 @@ public class ChildLockSettingsActivity extends Activity {
         int minutes = watchedSec / 60;
         tvTodayWatched.setText("今日儿童累计观看：" + minutes + " 分钟");
 
+        boolean hasUsageAccess = ChildLockManager.getInstance(this).hasUsageStatsAccess();
+        tvAppWhitelistStatus.setText("已选 " + store.getWhitelist().size() + " 个应用 · "
+                + (hasUsageAccess ? "使用情况访问已授权" : "未授权，点按查看授权方法"));
+        tvAppWhitelistStatus.setTextColor(hasUsageAccess ? 0xFF34C759 : 0xFFFFD54F);
+
         loadRulesList();
+    }
+
+    private static final class WhitelistAppEntry {
+        final String packageName;
+        final String label;
+
+        WhitelistAppEntry(String packageName, String label) {
+            this.packageName = packageName;
+            this.label = label;
+        }
+    }
+
+    private void showWhitelistEntry() {
+        if (ChildLockManager.getInstance(this).hasUsageStatsAccess()) {
+            showWhitelistAppDialog();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("需要使用情况访问权限")
+                .setMessage("授权后可准确识别前台应用，应用间直接切换时也能正确执行白名单豁免。\n\n"
+                        + "如电视没有授权入口，可通过 ADB 执行：\n"
+                        + "adb shell appops set com.cleantv.launcher android:get_usage_stats allow\n\n"
+                        + "未授权时仍会按本桌面的启动记录计时。")
+                .setPositiveButton("去授权", (dialog, which) -> openUsageAccessSettings())
+                .setNeutralButton("继续设置", (dialog, which) -> showWhitelistAppDialog())
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void openUsageAccessSettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        } catch (Exception e) {
+            Toast.makeText(this,
+                    "无法打开授权页，请使用 ADB：adb shell appops set com.cleantv.launcher android:get_usage_stats allow",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showWhitelistAppDialog() {
+        PackageManager pm = getPackageManager();
+        Set<String> seenPackages = new HashSet<>();
+        List<WhitelistAppEntry> apps = new ArrayList<>();
+        String[] categories = {Intent.CATEGORY_LEANBACK_LAUNCHER, Intent.CATEGORY_LAUNCHER};
+
+        for (String category : categories) {
+            Intent intent = new Intent(Intent.ACTION_MAIN).addCategory(category);
+            List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
+            for (ResolveInfo info : resolveInfos) {
+                if (info.activityInfo == null) continue;
+                String packageName = info.activityInfo.packageName;
+                if (packageName == null || packageName.equals(getPackageName())
+                        || !seenPackages.add(packageName)) {
+                    continue;
+                }
+                CharSequence appLabel = info.loadLabel(pm);
+                String label = appLabel != null && appLabel.toString().trim().length() > 0
+                        ? appLabel.toString() : packageName;
+                apps.add(new WhitelistAppEntry(packageName, label));
+            }
+        }
+
+        Collections.sort(apps, (a, b) -> {
+            int result = a.label.compareToIgnoreCase(b.label);
+            return result != 0 ? result : a.packageName.compareTo(b.packageName);
+        });
+
+        if (apps.isEmpty()) {
+            Toast.makeText(this, "未找到可添加的应用", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Set<String> selectedPackages = store.getWhitelist();
+        CharSequence[] labels = new CharSequence[apps.size()];
+        boolean[] checkedItems = new boolean[apps.size()];
+        for (int i = 0; i < apps.size(); i++) {
+            labels[i] = apps.get(i).label;
+            checkedItems[i] = selectedPackages.contains(apps.get(i).packageName);
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("选择不限时应用")
+                .setMultiChoiceItems(labels, checkedItems, (dialog, which, isChecked) ->
+                        checkedItems[which] = isChecked)
+                .setPositiveButton("保存", (dialog, which) -> {
+                    Set<String> updatedPackages = new java.util.LinkedHashSet<>();
+                    for (int i = 0; i < checkedItems.length; i++) {
+                        if (checkedItems[i]) updatedPackages.add(apps.get(i).packageName);
+                    }
+                    store.setWhitelist(updatedPackages);
+                    refreshStatus();
+                    Toast.makeText(this, "白名单已保存，共 " + updatedPackages.size() + " 个应用",
+                            Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void loadRulesList() {
