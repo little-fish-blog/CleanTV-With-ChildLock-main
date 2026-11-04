@@ -127,10 +127,10 @@ public class ChildLockManager {
             return false;
         }
 
-        // 处于儿童模式或未选择状态：如果还没选过模式，弹出【大人模式 / 儿童模式】大弹窗
+        // 管控时段未选择模式时直接进入儿童模式；成功进入后继续桌面初始化，确保应用列表完成加载。
         if (ChildLockStore.MODE_NONE.equals(mode)) {
-            showModeSelectDialog(deskActivity, matchedRule);
-            return true;
+            onChildModeSelected(deskActivity, matchedRule);
+            return !ChildLockStore.MODE_CHILD.equals(store.getCurrentSessionMode());
         }
 
         // 如果已经是儿童模式，验证今日累计限额与单次限制

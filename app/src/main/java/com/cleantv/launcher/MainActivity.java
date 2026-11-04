@@ -311,6 +311,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         AppAdapter.setAlwaysShowNames(true);
         AppAdapter.setUnifiedTiles(unifiedTiles());
         grid.setAdapter(adapter);
+        // Load before the first onResume(): the child-mode picker can short-circuit that pass.
+        adapter.reload();
+        grid.scheduleLayoutAnimation();
 
         // Emotn UI style: single row padding placed in middle-bottom
         // PaddingStart adjusted to 40dp (half the extra distance) per user requirement
